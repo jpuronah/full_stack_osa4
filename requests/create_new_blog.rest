@@ -2,8 +2,8 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-  "title": "Helldasadsdasas",
+  "title": "1223132321dsdasdasdasdasdaadsdasas",
   "author": "Jadasdasdasakko Kreikka",
   "url": "lodasadsdasl",
-  "likes": 21331212310
+  "likes": 213
 }
