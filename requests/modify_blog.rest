@@ -1,0 +1,8 @@
+PUT http://localhost:3003/api/blogs/
+
+{
+  "title": "1223132321dsdasdasdasdasdaadsdasas",
+  "author": "Jadasdasdasakko Kreikka",
+  "url": "lodasadsdasl",
+  "likes": 1111113
+}
