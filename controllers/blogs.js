@@ -1,12 +1,5 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const { requestLogger } = require('../utils/middleware')
-
-/*
-const app = require('../app')
-const config = require('../utils/config')
-const logger = require('../utils/logger')
-const mongoose = require('mongoose')*/
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({})
@@ -44,26 +37,19 @@ blogsRouter.post('/', async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
+blogsRouter.put('/:id', async (request, response) => {
+  //console.log('PUT', request.body)
+  const id = request.params.id
+  const updatedBlog = request.body
+  //console.log(id, updatedBlog)
+  await Blog.findByIdAndUpdate(id, updatedBlog, {new: true})
+  response.status(200).json(updatedBlog)
+  return
+})
+
 blogsRouter.delete('/:id', async (request, response) => {
   await Blog.findByIdAndRemove(request.params.id)
   response.status(204).end()
-})
-
-blogsRouter.put('/:id', async (request, response) => {
-  const body = request.body
-  
-  console.log("PUT", body)
-  const updatedBlog = {
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes
-  }
-
-  const updatedBlogDoc = await Blog.findByIdAndUpdate(request.params.id, updatedBlog, { new: true})
-  if (!updatedBlogDoc) {
-    return response.status(404).json()
-  }
 })
 
 module.exports = blogsRouter

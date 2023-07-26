@@ -1,8 +1,9 @@
-PUT http://localhost:3003/api/blogs/
+PUT http://localhost:3003/api/blogs/64c0fc85f7884a1983e75e37
+Content-Type: application/json
 
 {
-  "title": "1223132321dsdasdasdasdasdaadsdasas",
-  "author": "Jadasdasdasakko Kreikka",
-  "url": "lodasadsdasl",
-  "likes": 1111113
+  "title": "s",
+  "author": "2 Kreikka",
+  "url": "2",
+  "likes": 2
 }

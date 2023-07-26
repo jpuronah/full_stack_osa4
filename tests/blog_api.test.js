@@ -39,7 +39,7 @@ describe(' TEST correct ID format ', () => {
   test(' there is "id" ', async () => {
     //console.log('there is "id"')
     const response = await api.get('/api/blogs')
-    console.log("id", response)
+    //console.log("id", response)
     response.body.forEach((blog) => {
       ////console.log("foreach: ", blog)
       expect(blog.id).toBeDefined()
@@ -173,6 +173,93 @@ describe(' TEST http DELETE ', () => {
     //expect(updatedBlogs).toHaveLength(helper.initialBlogs.length - 1)
     expect(updatedBlogs.map(blog => blog.id)).not.toContain(idOfDeleted)
     
+  })
+})
+
+describe(' TEST http PUT ', () => {
+  test(' PUT -> likes increase by one ', async () => {
+    const response = await api.get('/api/blogs')
+    const initialBlog = response.body[0]
+    const idOfModified = initialBlog.id
+
+    const modifiedBlog = {
+      title: initialBlog.title,
+      author: initialBlog.author,
+      url: initialBlog.url,
+      likes: initialBlog.likes + 1
+    }
+    await api
+      .put(`/api/blogs/${idOfModified}`)
+      .send(modifiedBlog)
+      .expect(200)
+    const updatedResponse = await api.get('/api/blogs')
+    const updatedBlogs = updatedResponse.body
+    //console.log(updatedBlogs)
+    //console.log(updatedBlogs[0].likes, modifiedBlog.likes)
+    expect(updatedBlogs[0].likes).toBe(modifiedBlog.likes)
+  })
+  test(' PUT -> url is changed ', async () => {
+    const response = await api.get('/api/blogs')
+    const initialBlog = response.body[0]
+    const idOfModified = initialBlog.id
+
+    const modifiedBlog = {
+      title: initialBlog.title,
+      author: initialBlog.author,
+      url: 'www.modified_url.com',
+      likes: initialBlog.likes
+    }
+    await api
+      .put(`/api/blogs/${idOfModified}`)
+      .send(modifiedBlog)
+      .expect(200)
+    const updatedResponse = await api.get('/api/blogs')
+    const updatedBlogs = updatedResponse.body
+    //console.log(updatedBlogs)
+    //console.log(initialBlog.url, updatedBlogs[0].url, modifiedBlog.url)
+    expect(updatedBlogs[0].url).toBe(modifiedBlog.url)
+  })
+  test(' PUT -> author is changed ', async () => {
+    const response = await api.get('/api/blogs')
+    const initialBlog = response.body[0]
+    const idOfModified = initialBlog.id
+
+    const modifiedBlog = {
+      title: initialBlog.title,
+      author: 'Modifi Ed A. Uthor',
+      url: initialBlog.url,
+      likes: initialBlog.likes
+    }
+    await api
+      .put(`/api/blogs/${idOfModified}`)
+      .send(modifiedBlog)
+      .expect(200)
+    const updatedResponse = await api.get('/api/blogs')
+    const updatedBlogs = updatedResponse.body
+    //console.log(updatedBlogs)
+    //console.log(initialBlog.author, updatedBlogs[0].author, modifiedBlog.author)
+    expect(updatedBlogs[0].author).toBe(modifiedBlog.author)
+  })
+  test(' PUT -> title is changed ', async () => {
+    const response = await api.get('/api/blogs')
+    const initialBlog = response.body[0]
+    const idOfModified = initialBlog.id
+
+    const modifiedBlog = {
+      title: 'Modified title',
+      author: initialBlog.author,
+      url: initialBlog.url,
+      likes: initialBlog.likes
+    }
+    await api
+      .put(`/api/blogs/${idOfModified}`)
+      .send(modifiedBlog)
+      .expect(200)
+    const updatedResponse = await api.get('/api/blogs')
+    const updatedBlogs = updatedResponse.body
+    //console.log(updatedBlogs)
+    //console.log(initialBlog.title, updatedBlogs[0].title, modifiedBlog.title)
+    expect(updatedBlogs[0].title).toBe(modifiedBlog.title)
   })
 })
 
