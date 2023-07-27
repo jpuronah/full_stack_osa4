@@ -8,11 +8,7 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.get('/:id', async (request, response) => {
   const blog = await Blog.findById(request.params.id)
-  if (blog) {
-    response.json(blog)
-  } else {
-    response.status(404).end()
-  }
+  response.json(blog)
 })
 
 blogsRouter.post('/', async (request, response) => {
@@ -27,6 +23,7 @@ blogsRouter.post('/', async (request, response) => {
     url: body.url,
     likes: body.likes
   })
+  
   if (!body.likes) {
     blog.likes = 0
   } else {
@@ -38,10 +35,9 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.put('/:id', async (request, response) => {
-  //console.log('PUT', request.body)
   const id = request.params.id
   const updatedBlog = request.body
-  //console.log(id, updatedBlog)
+
   await Blog.findByIdAndUpdate(id, updatedBlog, {new: true})
   response.status(200).json(updatedBlog)
   return
