@@ -25,8 +25,7 @@ beforeEach(async () => {
 })
 
 describe(' TEST for json-format and blog count at /api/blogs ', () => {
-  test('notes are returned as JSON', async () => {
-    //console.log('notes are returned as JSON')
+  test('blogs are returned as JSON', async () => {
     await api
       .get('/api/blogs')
       .expect(200)
@@ -62,17 +61,31 @@ describe(' TEST correct ID format ', () => {
 })
 
 describe(' TEST http POST ', () => {
+  let user
+
+  beforeEach(async () => {
+    await User.deleteMany({})
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    user = new User({
+      username: 'root',
+      passwordHash: passwordHash,
+      name: 'superuser'
+    })
+    await user.save()
+  })
   test(' POST -> count gets bigger ', async () => {
-    //console.log('POST -> count gets bigger')
     const newBlog = {
       title: 'Titteli',
       author: 'Author R. A.',
       url: 'www.www.fi',
-      likes: 123
+      likes: 123,
+      userId: user._id,
     }
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY0Y2E1OTYwY2Q2ZTM5NWI1MmI2YzBhNSIsImlhdCI6MTY5MDk4NzMwMSwiZXhwIjoxNjkwOTkwOTAxfQ.uXQvcCTnB0yVXgYNfd8pMRNZFGK-ZziZsJuR67L8Jrw'
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', 'Bearer ' + token)
       .expect(201)
     
     const response = await api.get('/api/blogs')
@@ -104,12 +117,25 @@ describe(' TEST http POST ', () => {
 })
 
 describe(' TEST NULL likes ', () => {
+  let user
+
+  beforeEach(async () => {
+    await User.deleteMany({})
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    user = new User({
+      username: 'root',
+      passwordHash: passwordHash,
+      name: 'superuser'
+    })
+    await user.save()
+  })
   test(' if !likes -> likes = 0 ', async () => {
     //console.log('if !likes -> likes = 0')
     const newBlog = {
       title: 'TIEETEEEEELL',
       author: 'aSDASASASAS R. A.',
-      url: 'www.www.fi'
+      url: 'www.www.fi',
+      userId: user._id
       //likes: 123
     }
     await api.post('/api/blogs').send(newBlog)
