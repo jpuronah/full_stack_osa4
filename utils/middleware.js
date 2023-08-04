@@ -2,7 +2,6 @@ const logger = require('./logger')
 const jwt = require('jsonwebtoken')
 
 const getTokenFrom = request => {
-  
   const authorization = request.get('authorization')
   if (authorization && authorization.startsWith('Bearer ')) {
     return authorization.replace('Bearer ', '')
@@ -11,24 +10,22 @@ const getTokenFrom = request => {
 }
 
 const userExtractor = async (request, response, next) => {
-  console.log('USER EXTRACTOR')
+  //console.log('USER EXTRACTOR')
   if (['POST', 'PUT', 'DELETE'].includes(request.method)) {
     const token = getTokenFrom(request)
     if (!token) {
       return response.status(401).json({ error: 'Token missing' })
     }
-    console.log('TESTINGTESTINGTESTING')
     try {
       const userOfToken = jwt.verify(token, process.env.SECRET)
       
       if (!userOfToken.id) {
-        return response.status(401).json({ error: 'Invalid token ' })
+        return response.status(401).json({ error: ' Token missing ' })
       }
-      
       request.user = userOfToken
     }
     catch (error) {
-      return response.status(401).json({ error: 'Invalid token'})
+      return response.status(401).json({ error: 'Invalid token '})
     }
   }
   next()

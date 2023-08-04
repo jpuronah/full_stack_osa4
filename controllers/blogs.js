@@ -13,9 +13,7 @@ blogsRouter.post('/', async (request, response) => {
   if (!body.title || !body.url) {
     return response.status(400).json({error: 'Title or url missing' })
   }
-  
-  const user = await User.findById(userOfToken.id)
-  
+  let user = await User.findById(userOfToken.id)
   const blog = new Blog({
     title: body.title,
     author: body.author,
@@ -23,14 +21,11 @@ blogsRouter.post('/', async (request, response) => {
     likes: body.likes,
     user: user._id
   })
-  
   if (!body.likes) {
     blog.likes = 0
   } else {
     blog.likes = body.likes
   }
-
-  //console.log('BLOG', blog)
   const savedBlog = await blog.save()
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
@@ -87,17 +82,13 @@ blogsRouter.delete('/:id', async (request, response) => {
   if (!userOfToken.id) {// || !request.token) {
     return response.status(401).json({ error: 'user not found' })
   }
-
   const blog = await Blog.findById(request.params.id)
-
   if (!blog) {
     return response.status(404).json({ error: 'Blog not found' })
   }
-
   if (blog.user.toString() !== userOfToken.id.toString()) {
     return response.status(403).json({ error: 'You do not have rights to delete' })
   }
-
   await Blog.findByIdAndRemove(request.params.id)
   response.status(204).end()
 })

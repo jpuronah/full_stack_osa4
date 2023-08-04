@@ -10,6 +10,7 @@ const helper = require('./test_helper')
 // **  USER TESTS ** //
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
+const { userExtractor } = require('../utils/middleware')
 // **  USER TESTS ** //
 
 
@@ -74,20 +75,23 @@ describe(' TEST http POST ', () => {
     await user.save()
   })
   test(' POST -> count gets bigger ', async () => {
+    const user = await User.findOne({ username: 'root' })
+    console.log('POSTPOSTPOST', user)
     const newBlog = {
-      title: 'Titteli',
-      author: 'Author R. A.',
-      url: 'www.www.fi',
+      title: 'ROOT BLOG',
+      author: 'ROOT',
+      url: 'www.rootblog.com',
       likes: 123,
-      userId: user._id,
+      userId: user._id
     }
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY0Y2E1OTYwY2Q2ZTM5NWI1MmI2YzBhNSIsImlhdCI6MTY5MDk4NzMwMSwiZXhwIjoxNjkwOTkwOTAxfQ.uXQvcCTnB0yVXgYNfd8pMRNZFGK-ZziZsJuR67L8Jrw'
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY0Y2E1OTYwY2Q2ZTM5NWI1MmI2YzBhNSIsImlhdCI6MTY5MDk4NjIwMn0.kiUz70G_bE3LdzKwZkNyEMUUXEQEzqslYHhYWbl6xqg'
+    console.log('POSTPOSTPOST')
     await api
       .post('/api/blogs')
       .send(newBlog)
       .set('Authorization', 'Bearer ' + token)
       .expect(201)
-    
+    console.log('POSTPOSTPOST')
     const response = await api.get('/api/blogs')
     const updatedBlogs = response.body
 
@@ -123,20 +127,21 @@ describe(' TEST NULL likes ', () => {
     await User.deleteMany({})
     const passwordHash = await bcrypt.hash('sekret', 10)
     user = new User({
-      username: 'root',
+      username: 'root3',
       passwordHash: passwordHash,
-      name: 'superuser'
+      name: 'superuser3'
     })
     await user.save()
   })
   test(' if !likes -> likes = 0 ', async () => {
+    console.log('TESTTEST', user)
     //console.log('if !likes -> likes = 0')
     const newBlog = {
       title: 'TIEETEEEEELL',
       author: 'aSDASASASAS R. A.',
       url: 'www.www.fi',
-      userId: user._id
-      //likes: 123
+      userId: user._id,
+      likes: 123
     }
     await api.post('/api/blogs').send(newBlog)
     const response = await api.get('/api/blogs')
@@ -432,6 +437,31 @@ describe('When there is initially ONE user at database, ', () => {
       const usersAtEnd = await helper.usersInDb()
       expect(usersAtEnd).toHaveLength(usersAtStart.length)
     })
+  })
+})
+
+describe('TEST tokens: ', () => {
+  let user
+
+  beforeEach(async () => {
+    await User.deleteMany({})
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    user = new User({
+      username: 'root',
+      passwordHash: passwordHash,
+      name: 'superuser'
+    })
+    await user.save()
+  })
+  test(' adding blog without token returns 401 unauthorized ', async () => {
+    const newBlog = {
+      title: 'Titteli',
+      author: 'Author R. A.',
+      url: 'www.www.fi',
+      likes: 123,
+      userId: user._id,
+    }
+    await api.post('/api/blogs').send(newBlog).expect(401)
   })
 })
 
