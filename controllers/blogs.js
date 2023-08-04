@@ -1,36 +1,21 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
-const jwt = require('jsonwebtoken')
-
-/*
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
-  }
-  return null
-}*/
+//const jwt = require('jsonwebtoken')
 
 blogsRouter.post('/', async (request, response) => {
-  console.log('BLOGSROUTER')
-  const body = request.body
-  //const user = request.user
-  //console.log('USERTOKEN', user)
-  const userOfToken = jwt.verify(request.token, process.env.SECRET)
+  //console.log('BLOGSROUTER')
+  const userOfToken = request.user
   if (!userOfToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
+    return response.status(401).json({ error: 'user not found' })
   }
+  const body = request.body
   if (!body.title || !body.url) {
     return response.status(400).json({error: 'Title or url missing' })
   }
-  //console.log('BODY', body)
-  //const user = await User.findById(body.userId)
   
   const user = await User.findById(userOfToken.id)
   
-  //console.log('USER', user)
-  //const users = await User.findById({})
   const blog = new Blog({
     title: body.title,
     author: body.author,
@@ -45,7 +30,7 @@ blogsRouter.post('/', async (request, response) => {
     blog.likes = body.likes
   }
 
-  console.log('BLOG', blog)
+  //console.log('BLOG', blog)
   const savedBlog = await blog.save()
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
@@ -60,24 +45,47 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.get('/:id', async (request, response) => {
+  //console.log('GETGETGETGETGET')
   const blog = await Blog.findById(request.params.id)
   response.json(blog)
 })
 
 blogsRouter.put('/:id', async (request, response) => {
-  const id = request.params.id
-  const updatedBlog = request.body
+  const userOfToken = request.user
+  if (!userOfToken.id) {
+    return response.status(401).json({ error: 'user not found' })
+  }
+  const body = request.body
+  if (!body.title || !body.url) {
+    return response.status(400).json({error: 'Title or url missing' })
+  }
+  
+  const user = await User.findById(userOfToken.id)
 
+  const id = request.params.id
+  //const updatedBlog = request.body
+  const updatedBlog = {
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes,
+    user: user._id
+  }
+  
+  if (!body.likes) {
+    updatedBlog.likes = 0
+  } else {
+    updatedBlog.likes = body.likes
+  }
+  
   await Blog.findByIdAndUpdate(id, updatedBlog, {new: true})
   response.status(200).json(updatedBlog)
-  return
 })
-
+//const jwt = require('jsonwebtoken')
 blogsRouter.delete('/:id', async (request, response) => {
-  const userOfToken = jwt.verify(request.token, process.env.SECRET)
-  console.log('DECODED', userOfToken)
-  if (!userOfToken.id || !request.token) {
-    return response.status(401).json({ error: 'token invalid' })
+  const userOfToken = request.user
+  if (!userOfToken.id) {// || !request.token) {
+    return response.status(401).json({ error: 'user not found' })
   }
 
   const blog = await Blog.findById(request.params.id)

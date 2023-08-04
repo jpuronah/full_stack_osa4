@@ -3,8 +3,8 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY0Y2E1OTYwY2Q2ZTM5NWI1MmI2YzBhNSIsImlhdCI6MTY5MDk4NjIwMn0.kiUz70G_bE3LdzKwZkNyEMUUXEQEzqslYHhYWbl6xqg 
 
 {
-  "title": "JPURONAHTOKEN BLOGI2",
-  "author": "TOKEN2",
-  "url": "www.token2.com",
-  "likes": 123220222
+  "title": "ROOT BLOG",
+  "author": "ROOT",
+  "url": "www.rootblog.com",
+  "likes": 123
 }

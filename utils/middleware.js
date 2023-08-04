@@ -1,7 +1,8 @@
 const logger = require('./logger')
-//const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken')
 
 const getTokenFrom = request => {
+  
   const authorization = request.get('authorization')
   if (authorization && authorization.startsWith('Bearer ')) {
     return authorization.replace('Bearer ', '')
@@ -9,27 +10,34 @@ const getTokenFrom = request => {
   return null
 }
 
-const tokenExtractor = (request, response, next) => {
-  const token = getTokenFrom(request)
-  request.token = token
-  next()
-}
-/*
 const userExtractor = async (request, response, next) => {
   console.log('USER EXTRACTOR')
-  //await tokenExtractor(request, response)
+  if (['POST', 'PUT', 'DELETE'].includes(request.method)) {
+    const token = getTokenFrom(request)
+    if (!token) {
+      return response.status(401).json({ error: 'Token missing' })
+    }
+    console.log('TESTINGTESTINGTESTING')
+    try {
+      const userOfToken = jwt.verify(token, process.env.SECRET)
+      
+      if (!userOfToken.id) {
+        return response.status(401).json({ error: 'Invalid token ' })
+      }
+      
+      request.user = userOfToken
+    }
+    catch (error) {
+      return response.status(401).json({ error: 'Invalid token'})
+    }
+  }
+  next()
+}
+
+/*const tokenExtractor = (request, response, next) => {
   const token = getTokenFrom(request)
-  //const token = request.token// tokenExtractor(request)// request.token
-  console.log('token', token)
-  if (!token) {
-    return response.status(401).json({ error: 'Token missing' })
-  }
-  const userOfToken = jwt.verify(token, process.env.SECRET)
-  console.log(userOfToken)
-  if (!userOfToken.id) {
-    return response.status(401).json({ error: 'Invalid token ' })
-  }
-  request.user = userOfToken
+  console.log('tokenEXTRACTOR', token)
+  request.token = token
   next()
 }*/
 
@@ -65,6 +73,6 @@ module.exports = {
   requestLogger,
   unknownEndpoint,
   errorHandler,
-  tokenExtractor
-  //,userExtractor
+  //tokenExtractor,
+  userExtractor
 }
