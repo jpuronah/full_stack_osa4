@@ -28,7 +28,7 @@ loginRouter.post('/', async (request, response) => {
     //{ expiresIn: 60*60 }
   )
 
-  console.log('SECRET', process.env.SECRET)
+  //console.log('SECRET', process.env.SECRET)
 
   response
     .status(200)
